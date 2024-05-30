@@ -1,0 +1,22 @@
+#include <iostream>
+#include <Windows.h> // Sleep( )을 사용하기 위한 line
+using namespace std;
+int main() {
+//시간변수 = elapsedSeconds
+//잠드는 시간(간격) = T
+int elapsedSeconds = 0, x, T = 3;
+
+//randmax : 랜덤으로 나오는 수의 최대값
+cout << " RANDMAX  " << RAND_MAX << endl;
+
+//18초가 될때까지 계속 시행
+while (elapsedSeconds < 18) {
+//단위는 milliseconds이므로 1000을 곱함
+//즉, 3000밀리초동안 멈춤
+Sleep(T * 1000); 
+x = rand() % 100;  //0~99의 숫자가 랜덤으로 나옴 
+elapsedSeconds += T;
+cout << "  Elapsed time[sec] = " << elapsedSeconds << "   " << x << endl;
+}
+return 123;
+}
