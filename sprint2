@@ -1,0 +1,20 @@
+#include <iostream>
+#include <Windows.h> // Sleep( )을 사용하기 위한 line
+#include <vector>
+using namespace std;
+int main() {
+vector <int> q;
+int NI = 10, NO = 10, ni, no;
+for (int i = 0; i < NI; i++) {
+q.push_back(rand() % 20);
+cout << q[q.size() - 1] << " in " << q.size() << endl;
+}
+for (int i = 0; i < NO; i++) {
+int ii = q[0];
+if (q.size() != 0);
+cout << ii << " out " << q.size() << endl;
+q.erase(q.begin());
+}
+return 123;
+}
+
