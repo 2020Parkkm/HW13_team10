@@ -1,0 +1,130 @@
+// main.cpp
+#include <iostream>
+#include <Windows.h>
+#include <vector>
+#include <fstream>
+#include "q.h"
+
+using namespace std;
+
+int main() {
+    int itime = 0, T = 1, ni, no, high = 0, sum = 0;
+    float average = 0.0, Queue_fullness = 0.0;
+    int NofPackets[120] = { 0 };
+
+    ofstream xx;
+    xx.open("aa.txt");
+    if (!xx) {
+        cout << "Can't open file" << endl;
+        return 666;
+    }
+
+    ofstream yy;
+    yy.open("yy.txt");
+    if (!yy) {
+        cout << "Can't open file" << endl;
+        return 666;
+    }
+
+
+    vector<mqueue> queues;
+    int num_queues = 3;
+    for (int i = 0; i < num_queues; ++i) {
+        queues.push_back(mqueue(10, 30, 100, num_queues));
+    }
+
+    while (itime < 120) {
+        itime += T;
+        Sleep(T * 1000);
+        cout << "Elapsed time[sec] = " << itime << endl;
+
+        for (int i = 0; i < queues.size(); ++i) {
+            queues[i].newin();
+            queues[i].newout();
+            NofPackets[itime - 1] += queues[i].queue.size();
+        }
+
+        for (int i = 0; i < queues.size(); ++i) {
+            if (high < queues[i].queue.size()) {
+                high = queues[i].queue.size();
+            }
+        }
+
+        sum += NofPackets[itime - 1];
+    }
+
+    Queue_fullness = static_cast<float>(NofPackets[119]) / queues[0].capacity * 100;
+    average = static_cast<float>(sum) / itime;
+
+    int j = 0;
+    for (int a : NofPackets) {
+        j++;
+        xx << j << " " << a << endl;
+    }
+
+    yy << Queue_fullness << endl;
+
+    cout << "Highest: " << high << " Average: " << average << endl;
+    cout << "Packet loss rate " << queues[0].Packet_loss_rate << " Queue fullness % " << Queue_fullness << endl;
+    cout << NofPackets[30] << " " << queues[0].capacity << endl;
+    cout << queues[0].lost << " " << queues[0].xxx << endl;
+    xx.close();
+    yy.close();
+
+    return 123;
+}
+
+//q.h
+#include <iostream>
+#include <vector>
+#include <Windows.h>
+using namespace std;
+
+class mqueue {
+public:
+    mqueue(int Ni, int No, int Capacity, int num_queues) : NI(Ni), NO(No), capacity(Capacity), lost(0) {
+        // 큐의 개수만큼 초기화
+        for (int i = 0; i < num_queues; ++i) {
+            queue.push_back(vector<int>());
+        }
+    };
+
+    int NI, NO, capacity, lost, ni, no;
+    vector<vector<int>> queue;
+    int xxx = NO / NI;
+    int Packet_loss_rate;
+
+    void newin() {
+        for (int i = 0; i < queue.size(); ++i) {
+            ni = rand() % NI;
+            cout << "ni for queue " << i << ": " << ni << endl;
+
+            if (capacity < queue[i].size() + ni) {
+                lost += queue[i].size() + ni - capacity;
+                ni = capacity - queue[i].size();
+                cout << "Overflow for queue " << i << endl;
+                Packet_loss_rate = lost;
+            }
+
+            for (int j = 0; j < ni; j++) {
+                queue[i].push_back(rand() % 20);
+                cout << queue[i][queue[i].size() - 1] << " in " << queue[i].size() << " for queue " << i << endl;
+            }
+            cout << endl;
+        }
+    }
+
+    void newout() {
+        for (int i = 0; i < queue.size(); ++i) {
+            no = rand() % NO;
+            cout << "no for queue " << i << ": " << no << endl;
+
+            for (int j = 0; j < no && !queue[i].empty(); j++) {
+                int ii = queue[i][0];
+                cout << ii << " out " << queue[i].size() << " for queue " << i << endl;
+                queue[i].erase(queue[i].begin());
+            }
+            cout << endl;
+        }
+    }
+};
